@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Ya no necesitas css/pages/estadisticas.css si todo está con Tailwind -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/estadisticas.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <section class="mb-10">
+        <div class="bg-white shadow-md rounded-xl p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Estadísticas de Emociones</h2>
+            
+            <div class="flex flex-col gap-6 items-center">
+                <canvas id="grafico-emociones" class="w-full max-w-3xl max-h-[400px]"></canvas>
+                {{ registros|json_script:"datos-registros" }}
+                {% if registros %}
+                <div class="bg-blue-100 text-blue-900 p-6 rounded-lg text-center shadow w-full max-w-sm">
+                    <div class="text-4xl font-bold mb-2">{{ registros.0.total }}</div>
+                    <div class="text-xl font-semibold">Emoción más frecuente: {{ registros.0.emocion }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+
+        </div>
+    </section>
+
+    <section class="mb-10">
+        <div class="bg-white shadow-md rounded-xl p-6 overflow-x-auto">
+            {% if registros %}
+            <table class="min-w-full table-auto text-sm text-left">
+                <thead class="bg-gray-200 text-gray-700 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-4 py-2">Emoción</th>
+                        <th class="px-4 py-2">Total</th>
+                        <th class="px-4 py-2">Porcentaje</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for registro in registros %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ registro.emocion }}</td>
+                        <td class="px-4 py-2">{{ registro.total }}</td>
+                        <td class="px-4 py-2">{{ registro.total|floatformat:"1" }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="text-center text-gray-500">No hay registros de emociones disponibles.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if posible_depresion %}
+    <section>
+        <div class="bg-red-100 border border-red-400 text-red-800 p-4 rounded-xl shadow">
+            <h3 class="text-xl font-semibold mb-2">⚠️ Alerta de Depresión</h3>
+            <p>Se ha detectado una posible depresión debido a la cantidad de emociones tristes registradas.</p>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
